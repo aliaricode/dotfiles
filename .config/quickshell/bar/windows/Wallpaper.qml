@@ -33,6 +33,8 @@ BaseExpandPopup {
         if (root.wallpapers.length === 0 || Date.now() - root.lastScanTime > 30000) {
             root.lastScanTime = Date.now()
             wallpaperScanner.running = true
+        } else {
+            root.reshuffle()
         }
         syncPresetSelection()
     }
@@ -52,6 +54,26 @@ BaseExpandPopup {
     readonly property var filteredWallpapers: root.selectedCategory === "All"
         ? root.wallpapers
         : root.wallpapers.filter(f => f.split("/")[0] === root.selectedCategory)
+
+    // ---- shuffle (display order only; doesn't touch actual scan order) ----
+    property var shuffledFiltered: []
+
+    function shuffleArray(arr) {
+        const a = arr.slice()
+        for (let i = a.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1))
+            const tmp = a[i]
+            a[i] = a[j]
+            a[j] = tmp
+        }
+        return a
+    }
+
+    function reshuffle() {
+        root.shuffledFiltered = root.shuffleArray(root.filteredWallpapers)
+    }
+
+    onFilteredWallpapersChanged: root.reshuffle()
 
     function cycleCategory(step) {
         const list = ["All", ...root.categories]
@@ -372,14 +394,14 @@ BaseExpandPopup {
         orientation: ListView.Horizontal
         spacing: 8
         clip: true
-        model: root.filteredWallpapers
+        model: root.shuffledFiltered
 
         flickDeceleration: 3000
         maximumFlickVelocity: 4000
 
         Keys.onReturnPressed: {
-            if (currentIndex >= 0 && currentIndex < root.filteredWallpapers.length) {
-                root.applyWallpaper(root.filteredWallpapers[currentIndex], currentIndex)
+            if (currentIndex >= 0 && currentIndex < root.shuffledFiltered.length) {
+                root.applyWallpaper(root.shuffledFiltered[currentIndex], currentIndex)
             }
         }
         Keys.onTabPressed: (event) => {
@@ -393,6 +415,9 @@ BaseExpandPopup {
         Keys.onPressed: (event) => {
             if (event.key === Qt.Key_Space) {
                 root.cycleCategory(event.modifiers & Qt.ShiftModifier ? -1 : 1)
+                event.accepted = true
+            } else if (event.key === Qt.Key_R) {
+                root.reshuffle()
                 event.accepted = true
             }
         }
