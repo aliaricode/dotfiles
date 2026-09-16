@@ -43,6 +43,15 @@ BaseExpandPopup {
 
     readonly property int activeListCount: activeModel ? activeModel.count : 0
 
+    readonly property string currentError: {
+        if (currentView === "search") return Spotify.searchError
+        if (currentView === "playlists") {
+            return playlistMode === "tracks" ? Spotify.tracksError : Spotify.playlistsError
+        }
+        if (currentView === "queue") return Spotify.queueError
+        return ""
+    }
+
     minIndex: 0
     maxIndex: Math.max(activeListCount - 1, 0)
 
@@ -52,7 +61,7 @@ BaseExpandPopup {
         playlistMode = "browse"
         selectedIndex = 0
 
-        if (view === "playlists" && Spotify.playlists.count === 0) Spotify.loadPlaylists()
+        if (view === "playlists") Spotify.loadPlaylists()
         if (view === "queue") Spotify.loadQueue()
     }
 
@@ -63,6 +72,11 @@ BaseExpandPopup {
 
     function openPlaylist(playlist) {
         if (!playlist) return
+        // Followed playlists can't be listed through the API, only played.
+        if (playlist.browsable === false) {
+            playPlaylistMix(playlist)
+            return
+        }
         Spotify.loadPlaylistTracks(playlist.id, playlist.name)
         playlistMode = "tracks"
         selectedIndex = 0
@@ -95,7 +109,6 @@ BaseExpandPopup {
         currentView = "nowPlaying"
         playlistMode = "browse"
         Spotify.clearSearch()
-        if (!Spotify.hasDevice) Spotify.refreshDevice()
     }
 
     onSearchEdited: (text) => {
@@ -221,8 +234,8 @@ BaseExpandPopup {
 
             emptyText: Spotify.isSearching
                 ? "Searching..."
-                : (Spotify.lastError !== ""
-                    ? Spotify.lastError
+                : (Spotify.searchError !== ""
+                    ? Spotify.searchError
                     : (popup.searchText === "" ? "Type to search" : "No results"))
 
             onSelectedIndexChanged: if (popup.selectedIndex !== selectedIndex) popup.selectedIndex = selectedIndex
@@ -269,7 +282,7 @@ BaseExpandPopup {
 
                 emptyText: Spotify.isLoadingPlaylists
                     ? "Loading playlists..."
-                    : (Spotify.lastError !== "" ? Spotify.lastError : "No playlists found")
+                    : (Spotify.playlistsError !== "" ? Spotify.playlistsError : "No playlists found")
 
                 onSelectedIndexChanged: if (popup.selectedIndex !== selectedIndex) popup.selectedIndex = selectedIndex
                 Connections {
@@ -285,7 +298,10 @@ BaseExpandPopup {
                         thumbnailSize: 36
                         thumbnailSource: modelData ? (modelData.thumbnail ?? "") : ""
                         primaryText: modelData ? (modelData.name ?? "") : ""
-                        secondaryText: modelData ? ((modelData.trackCount ?? 0) + " tracks") : ""
+                        secondaryText: !modelData ? ""
+                            : (modelData.browsable === false
+                                ? "Followed playlist"
+                                : (modelData.trackCount ?? 0) + " tracks")
                         showPlayButton: true
                         onActivated: popup.openPlaylist(modelData)
                         onPlayRequested: popup.playPlaylistMix(modelData)
@@ -307,7 +323,7 @@ BaseExpandPopup {
 
                 emptyText: Spotify.isLoadingTracks
                     ? "Loading tracks..."
-                    : (Spotify.lastError !== "" ? Spotify.lastError : "No tracks found")
+                    : (Spotify.tracksError !== "" ? Spotify.tracksError : "No tracks found")
 
                 onSelectedIndexChanged: if (popup.selectedIndex !== selectedIndex) popup.selectedIndex = selectedIndex
                 Connections {
@@ -346,7 +362,7 @@ BaseExpandPopup {
 
             emptyText: Spotify.isLoadingQueue
                 ? "Loading queue..."
-                : (Spotify.lastError !== "" ? Spotify.lastError : "Queue is empty")
+                : (Spotify.queueError !== "" ? Spotify.queueError : "Queue is empty")
 
             onSelectedIndexChanged: if (popup.selectedIndex !== selectedIndex) popup.selectedIndex = selectedIndex
             Connections {
@@ -455,6 +471,40 @@ BaseExpandPopup {
             }
 
             Item { Layout.fillHeight: true }
+        }
+
+        // ── ERROR BANNER ─────────────────────────────────────
+        Rectangle {
+            id: errorBanner
+            visible: popup.currentError !== "" && popup.activeListCount > 0
+            anchors {
+                left: parent.left
+                right: parent.right
+                bottom: parent.bottom
+                margins: 6
+            }
+            height: bannerText.implicitHeight + 14
+            radius: 8
+            z: 10
+            color: Theme.hexToRgba(Theme.color1, 0.18)
+            border.color: Theme.hexToRgba(Theme.color1, 0.5)
+            border.width: 1
+
+            Text {
+                id: bannerText
+                anchors {
+                    left: parent.left
+                    right: parent.right
+                    verticalCenter: parent.verticalCenter
+                    leftMargin: 10
+                    rightMargin: 10
+                }
+                text: "\uf071  " + popup.currentError
+                font.family: "Symbols Nerd Font"
+                font.pixelSize: 11
+                color: Theme.foreground
+                wrapMode: Text.WordWrap
+            }
         }
     }
 }

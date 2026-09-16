@@ -1,6 +1,7 @@
 -- ~/.config/hypr/lua/keybinds.lua
 local vars = require("lua.variables")
 local mod = "SUPER"
+local lotm = require("scripts.lotm")
 
 -- ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 -- ┃                     Core Applications                       ┃
@@ -126,6 +127,14 @@ hl.bind(
 	hl.dsp.window.resize(),
 	{ mouse = true, description = "Focus & Move: Resize window (mouse)" }
 )
+
+hl.bind(mod .. " + T", function()
+	lotm.setup()
+end, { description = "Set up the LotM translation workspace" })
+
+hl.bind(mod .. " + SHIFT + T", function()
+	lotm.lookup()
+end, { description = "Toggle the LotM lookup scratchpad" })
 
 -- ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 -- ┃                   Clipboard & Screenshots                   ┃

@@ -10,7 +10,10 @@ local browsers =
 hl.window_rule({ match = { class = "^" .. browsers .. "$" }, tag = "+browser" })
 
 -- Terminal
-hl.window_rule({ match = { class = "^(Alacritty|kitty|kitty-dropterm|KWrite)$" }, tag = "+terminal" })
+hl.window_rule({
+	match = { class = "^(Alacritty|kitty|kitty-dropterm|KWrite|lotm-editor|lotm-scripts|lotm-lookup)$" },
+	tag = "+terminal",
+})
 
 -- Projects / IDEs
 hl.window_rule({
