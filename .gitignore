@@ -3,6 +3,7 @@
 .config/alacritty/colors.toml
 .config/btop/themes/wallust.theme
 .config/hypr/hypr-colors.conf
+.config/hypr/monitors.lua
 .config/hypr/lua/colors.lua
 .config/gtk-3.0/gtk-colors.css
 .config/gtk-4.0/gtk-colors.css

@@ -30,6 +30,7 @@ BaseExpandPopup {
 
     onOpened: {
         applyingIndex = -1
+        root.selectedTarget = root.openedScreenName
         if (root.wallpapers.length === 0 || Date.now() - root.lastScanTime > 30000) {
             root.lastScanTime = Date.now()
             wallpaperScanner.running = true
@@ -47,6 +48,87 @@ BaseExpandPopup {
     property var thumbPaths: ({})
     property var wallpapers: []
     property string currentWallpaper: ""
+
+    // ---- monitor targeting ----
+    property var wallpaperByMonitor: ({})
+    property string selectedTarget: "All"
+    readonly property string monitorStateFile: root.homeDir + "/.cache/quickshell/monitor-wallpapers.json"
+
+    readonly property string themeScreenOverride: ""
+
+    readonly property string openedScreenName: barWindow?.screen?.name ?? Hyprland.focusedMonitor?.name ?? ""
+
+    readonly property var screenNames: {
+        const names = []
+        for (let i = 0; i < Quickshell.screens.length; i++) names.push(Quickshell.screens[i].name)
+        return names
+    }
+    readonly property var targets: ["All", ...root.screenNames]
+    readonly property string effectiveTarget: root.targets.includes(root.selectedTarget) ? root.selectedTarget : "All"
+
+    readonly property string themeScreenName: {
+        if (root.themeScreenOverride !== "") return root.themeScreenOverride
+        let best = ""
+        let bestArea = -1
+        for (let i = 0; i < Quickshell.screens.length; i++) {
+            const s = Quickshell.screens[i]
+            if (s.width * s.height > bestArea) {
+                bestArea = s.width * s.height
+                best = s.name
+            }
+        }
+        return best
+    }
+
+    function screenByName(name) {
+        for (let i = 0; i < Quickshell.screens.length; i++) {
+            if (Quickshell.screens[i].name === name) return Quickshell.screens[i]
+        }
+        return null
+    }
+
+    function wallpaperFor(name) {
+        return root.wallpaperByMonitor[name] ?? root.currentWallpaper
+    }
+
+    function isShownOn(path) {
+        const t = root.effectiveTarget
+        if (t === "All") {
+            const names = root.screenNames
+            if (names.length === 0) return path === root.currentWallpaper
+            return names.every(n => root.wallpaperFor(n) === path)
+        }
+        return root.wallpaperFor(t) === path
+    }
+
+    function cycleTarget(step) {
+        const list = root.targets
+        const idx = list.indexOf(root.effectiveTarget)
+        root.selectedTarget = list[(idx + step + list.length) % list.length]
+    }
+
+    readonly property real targetAspect: {
+        const s = root.screenByName(root.effectiveTarget)
+        return s && s.height > 0 ? s.width / s.height : 0
+    }
+    readonly property real thumbWidth: root.targetAspect > 0
+        ? Math.round(Math.max(90, Math.min(480, thumbList.height * root.targetAspect)))
+        : 200
+
+    FileView {
+        id: monitorStateFileView
+        path: root.monitorStateFile
+        watchChanges: true
+        onFileChanged: reload()
+        onLoaded: {
+            try {
+                root.wallpaperByMonitor = JSON.parse(monitorStateFileView.text() || "{}")
+            } catch (e) {
+                root.wallpaperByMonitor = {}
+            }
+        }
+        onLoadFailed: root.wallpaperByMonitor = {}
+    }
 
     // ---- categories (subfolders under Pictures/wallpapers) ----
     property var categories: []
@@ -271,15 +353,30 @@ BaseExpandPopup {
 
     function commitWallpaper() {
         const path = root.wallpaperRoot + "/" + root.pendingFilename
+        const target = root.effectiveTarget
+        // Only the theme monitor (or "All") is allowed to retint the shell.
+        const drivesTheme = target === "All" || target === root.themeScreenName
 
+        // No --output means every monitor (the old behaviour); the script's
+        // second positional argument is still the optional preset path.
         applyWallpaperProc.command = [
             root.homeDir + "/.config/quickshell/scripts/apply-wallpaper.sh",
-            path
+            path,
+            ...(target === "All" ? [] : ["--output", target]),
+            ...(drivesTheme ? [] : ["--no-theme"])
         ]
         applyWallpaperProc.running = true
 
-        root.currentWallpaper = path
-        root.generatePresetsFor(path)
+        // Optimistic update so checkmarks are right even before the script
+        // has rewritten the state file.
+        const map = Object.assign({}, root.wallpaperByMonitor)
+        for (const n of (target === "All" ? root.screenNames : [target])) map[n] = path
+        root.wallpaperByMonitor = map
+
+        if (drivesTheme) {
+            root.currentWallpaper = path
+            root.generatePresetsFor(path)
+        }
         close()
     }
 
@@ -319,6 +416,52 @@ BaseExpandPopup {
                 font.bold: root.showingThemeTab
             }
             TapHandler { onTapped: root.showingThemeTab = true }
+        }
+    }
+
+    // Target monitor chips (wallpaper tab only, and only with 2+ screens)
+    Row {
+        id: targetRow
+        anchors { top: parent.top; right: parent.right }
+        height: tabRow.height
+        spacing: 6
+        visible: !root.showingThemeTab && root.screenNames.length > 1
+
+        Text {
+            height: targetRow.height
+            verticalAlignment: Text.AlignVCenter
+            text: "Apply to"
+            color: Theme.hexToRgba(Theme.foreground, 0.5)
+            font.pixelSize: 10
+        }
+
+        Repeater {
+            model: root.targets
+
+            delegate: Rectangle {
+                readonly property bool isSelected: root.effectiveTarget === modelData
+                readonly property var scr: root.screenByName(modelData)
+                readonly property bool isThemeScreen: modelData === root.themeScreenName
+
+                width: targetLabel.implicitWidth + 16
+                height: targetRow.height
+                radius: 8
+                color: isSelected ? Theme.hexToRgba(Theme.color5, 0.3) : Theme.hexToRgba(Theme.foreground, 0.06)
+                border.color: isSelected ? Theme.color5 : "transparent"
+                border.width: 1
+                Behavior on color { ColorAnimation { duration: 120 } }
+
+                Text {
+                    id: targetLabel
+                    anchors.centerIn: parent
+                    text: (isThemeScreen ? "● " : "") + modelData
+                        + (scr ? "  " + scr.width + "×" + scr.height : "")
+                    color: Theme.foreground
+                    font.pixelSize: 10
+                    font.bold: isSelected
+                }
+                TapHandler { onTapped: root.selectedTarget = modelData }
+            }
         }
     }
 
@@ -419,12 +562,15 @@ BaseExpandPopup {
             } else if (event.key === Qt.Key_R) {
                 root.reshuffle()
                 event.accepted = true
+            } else if (event.key === Qt.Key_M) {
+                root.cycleTarget(event.modifiers & Qt.ShiftModifier ? -1 : 1)
+                event.accepted = true
             }
         }
 
         highlight: Item {
             z: 2
-            width: 200
+            width: root.thumbWidth
             height: thumbList.height
 
             Rectangle {
@@ -449,10 +595,10 @@ BaseExpandPopup {
 
         delegate: Item {
             id: thumb
-            width: 200
+            width: root.thumbWidth
             height: thumbList.height
             readonly property string filename: modelData
-            readonly property bool isCurrent: root.currentWallpaper === root.wallpaperRoot + "/" + filename
+            readonly property bool isCurrent: root.isShownOn(root.wallpaperRoot + "/" + filename)
             readonly property bool applying: index === root.applyingIndex
 
             scale: applying ? 1.05 : 1.0
@@ -476,7 +622,7 @@ BaseExpandPopup {
                 source: "file://" + (root.thumbPaths[filename]
                     ?? (root.homeDir + "/Pictures/wallpapers/" + filename))
                 fillMode: Image.PreserveAspectCrop
-                sourceSize.width: 400
+                sourceSize.width: Math.max(400, root.thumbWidth * 2)
                 asynchronous: true
                 cache: true
 
