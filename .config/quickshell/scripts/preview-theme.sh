@@ -33,4 +33,14 @@ trap 'rm -f "$tmp_toml" "$out_json.tmp"' EXIT
 } >"$tmp_toml"
 
 wallust run -s -q -C "$tmp_toml" "$still"
+
+# Same color fixes the real apply uses (apply-theme.sh), so the swatches in
+# the Theme tab show what will actually be applied. If the fixer fails, the
+# raw preview is better than no preview.
+profile=$(basename "$preset_config" .toml)
+if command -v python3 >/dev/null 2>&1; then
+  python3 "$script_dir/palette-fix.py" --profile "$profile" \
+    --in "$out_json.tmp" --out "$out_json.tmp" 2>/dev/null || true
+fi
+
 mv "$out_json.tmp" "$out_json"

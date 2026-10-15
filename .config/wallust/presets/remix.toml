@@ -1,0 +1,6 @@
+# Same wallpaper, different mood: palette-fix.json rotates every hue by 70 degrees.
+backend = "fastresize"
+color_space = "lch"
+palette = "harddarkcomp"
+saturation = 80
+check_contrast = false

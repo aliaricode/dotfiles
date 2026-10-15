@@ -1,10 +1,6 @@
 [mgr]
 prepend_keymap = [
-    # Force Enter to go INSIDE directory
-    { on = [ "<Enter>" ], run = "enter", desc = "Enter directory" },
-    # Force Right Arrow to go INSIDE directory
+    { on = "l",       run = "plugin smart-enter", desc = "Enter dir or open file" },
+    { on = "<Enter>", run = "plugin smart-enter", desc = "Enter dir or open file" },
     { on = [ "<Right>" ], run = "enter", desc = "Enter directory" },
-    
-    # Keep 'l' as enter too if you want vim-keys
-    { on = [ "l" ], run = "enter", desc = "Enter directory" }
 ]

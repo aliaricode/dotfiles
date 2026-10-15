@@ -1,5 +1,0 @@
-backend = "fastresize"
-color_space = "lab"
-palette = "softlight"
-saturation = 35
-check_contrast = true

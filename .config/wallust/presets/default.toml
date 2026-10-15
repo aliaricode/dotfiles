@@ -1,0 +1,8 @@
+# The look you get from a plain wallpaper change. This is a copy of the colour
+# options in ../wallust.toml so "default" can be picked in the theme chooser;
+# if you change those options there, change them here too.
+backend = "fastresize"
+color_space = "lch"
+palette = "harddarkcomp"
+saturation = 70
+check_contrast = false

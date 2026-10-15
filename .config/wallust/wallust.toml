@@ -64,3 +64,4 @@ wallust_json = { template = 'wallust-json.hbs', target = '~/.config/wallust/wall
 vscode = { template = 'vscode.json', target = '~/.cache/wallust/colors.json' }
 vscode2 = { template = 'vscode', target = '~/.cache/wallust/colors' }
 quickshell = { template = 'quickshell-theme.json.hbs', target = '~/.config/quickshell/bar/theme.json.new' }
+neopywal = { template = 'colors_neopywal.vim', target = '~/.cache/wallust/colors_neopywal.vim' }

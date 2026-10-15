@@ -1,0 +1,6 @@
+# Softer than default: lower chroma, but the fixer keeps every colour readable.
+backend = "fastresize"
+color_space = "lch"
+palette = "darkcomp16"
+saturation = 40
+check_contrast = false

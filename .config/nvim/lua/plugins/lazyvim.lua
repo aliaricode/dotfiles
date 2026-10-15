@@ -4,7 +4,7 @@ return {
     "LazyVim/LazyVim",
     opts = {
       -- This changes the default colorscheme from 'tokyonight'
-      colorscheme = "catppuccin",
+      colorscheme = "neopywal",
     },
   },
   {

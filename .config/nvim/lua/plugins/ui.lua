@@ -1,10 +1,4 @@
 return {
-  -- This adds the indent lines
-  {
-    "echasnovski/mini.indentscope",
-    version = "*",
-    opts = {},
-  },
 
   -- This adds the 'surround' keybinds
   {

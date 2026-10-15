@@ -1,9 +1,0 @@
-[manager]
-ratio          = [ 1, 4, 3 ]  # Parent, Current, Preview width
-sort_by        = "natural"
-sort_sensitive = false
-sort_reverse   = false
-sort_dir_first = true
-linemode       = "size"
-show_hidden    = false
-show_symlink   = true

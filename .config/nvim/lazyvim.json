@@ -1,6 +1,10 @@
 {
   "extras": [
-    "lazyvim.plugins.extras.lang.markdown"
+    "lazyvim.plugins.extras.editor.aerial",
+    "lazyvim.plugins.extras.lang.clangd",
+    "lazyvim.plugins.extras.lang.markdown",
+    "lazyvim.plugins.extras.lang.toml",
+    "lazyvim.plugins.extras.util.dot"
   ],
   "install_version": 8,
   "news": {

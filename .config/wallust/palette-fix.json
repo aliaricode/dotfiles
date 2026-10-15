@@ -1,0 +1,35 @@
+{
+  "_readme": "Per-preset settings for palette-fix.py, keyed by preset name (presets/<name>.toml). 'default' applies to everything and to wallpapers applied without a preset; other entries only override what they list. Keys are documented at the top of palette-fix.py.",
+
+  "default": {
+    "accent_contrast": 5.5,
+    "chroma_min": 28
+  },
+
+  "vibrant": {
+    "chroma_scale": 1.3,
+    "chroma_min": 40,
+    "chroma_max": 85
+  },
+
+  "calm": {
+    "chroma_scale": 0.7,
+    "chroma_min": 16,
+    "chroma_max": 50,
+    "accent_contrast": 5.5
+  },
+
+  "mono": {
+    "chroma_scale": 0.22,
+    "chroma_min": 0,
+    "chroma_max": 14,
+    "accent_contrast": 5.0,
+    "spread": 6
+  },
+
+  "remix": {
+    "hue_shift": 70,
+    "chroma_min": 32,
+    "accent_contrast": 5.5
+  }
+}

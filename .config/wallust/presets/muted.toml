@@ -1,5 +1,0 @@
-backend = "fastresize"
-color_space = "lch"
-palette = "softdark"
-saturation = 25
-check_contrast = false

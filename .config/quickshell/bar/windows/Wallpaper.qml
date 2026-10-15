@@ -171,7 +171,7 @@ BaseExpandPopup {
 
     // ---- theme presets ----
     property bool showingThemeTab: false
-    readonly property var themePresets: ["vibrant", "muted", "pastel", "dark", "mono"]
+    readonly property var themePresets: ["default", "vibrant", "calm", "mono", "remix"]
     property string previewedWallpaper: ""
     property bool generatingPresets: false
     property var presetPreviewPaths: ({})
