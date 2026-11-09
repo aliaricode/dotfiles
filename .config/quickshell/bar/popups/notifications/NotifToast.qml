@@ -163,6 +163,12 @@ PanelWindow {
                     }
                 }
             }
+
+            NotifActions {
+                Layout.fillWidth: true
+                Layout.topMargin: 4
+                notification: root.notif
+            }
         }
 
         TapHandler {

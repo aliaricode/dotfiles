@@ -31,19 +31,28 @@ Singleton {
         })
     }
 
+    // Results are only applied on a clean exit, so a failed check (offline,
+    // mirror down) keeps the last known list instead of resetting it to 0.
+    // checkupdates exits 2 for "no updates"; paru -Qua exits 1 for the same.
     Process {
         id: repoCheck
         command: ["checkupdates"]
-        stdout: StdioCollector {
-            onStreamFinished: root.repoUpdates = root.parseUpdateLines(text, "repo")
+        property string out: ""
+        stdout: StdioCollector { onStreamFinished: repoCheck.out = text }
+        onExited: (code) => {
+            if (code === 0 || code === 2)
+                root.repoUpdates = root.parseUpdateLines(code === 0 ? out : "", "repo")
         }
     }
 
     Process {
         id: aurCheck
         command: ["paru", "-Qua"]
-        stdout: StdioCollector {
-            onStreamFinished: root.aurUpdates = root.parseUpdateLines(text, "aur")
+        property string out: ""
+        stdout: StdioCollector { onStreamFinished: aurCheck.out = text }
+        onExited: (code) => {
+            if (code === 0 || out.trim() === "")
+                root.aurUpdates = root.parseUpdateLines(code === 0 ? out : "", "aur")
         }
     }
 
@@ -54,7 +63,8 @@ Singleton {
 
     Process {
         id: updateProc
-        command: ["alacritty", "-e", "paru"]
+        // --hold keeps the window open so errors can be read before closing it
+        command: [Quickshell.env("TERMINAL") || "alacritty", "--hold", "-e", "paru"]
         onRunningChanged: root.updating = running
         onExited: root.refresh()
     }

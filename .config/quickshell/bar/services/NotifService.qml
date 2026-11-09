@@ -2,13 +2,26 @@ pragma Singleton
 
 import qs
 import Quickshell
+import Quickshell.Io
 import Quickshell.Services.Notifications
 import QtQuick
 
 Singleton {
     id: root
 
-    property bool dnd: false
+    // Do Not Disturb survives shell restarts
+    readonly property alias dnd: dndSettings.dnd
+    FileView {
+        path: Quickshell.dataPath("notifications.json")
+        printErrors: false // first run: created on the first DND toggle
+        watchChanges: true
+        onFileChanged: reload()
+        onAdapterUpdated: writeAdapter()
+        JsonAdapter {
+            id: dndSettings
+            property bool dnd: false
+        }
+    }
 
     // ── TOAST STATE ────────────────────────────────────────────
     property var toastNotification: null
@@ -20,7 +33,7 @@ Singleton {
     readonly property int queuedCount: toastQueue.length
 
     readonly property var server: NotificationServer {
-        actionsSupported: false
+        actionsSupported: true
         bodySupported: true
         imageSupported: true
         keepOnReload: true
@@ -170,7 +183,7 @@ Singleton {
     }
 
     function toggleDnd() {
-        root.dnd = !root.dnd
+        dndSettings.dnd = !dndSettings.dnd
         if (root.dnd) {
             root.toastQueue = []
             root.dismissToast()

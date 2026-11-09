@@ -25,7 +25,9 @@ from googleapiclient.discovery import build
 
 SCOPES = ["https://www.googleapis.com/auth/calendar.events"]
 
-CONFIG_DIR = os.path.expanduser("~/.config/quickshell/scripts")
+# Secrets live outside the dotfiles checkout so they can never be committed or stowed
+CONFIG_DIR = os.path.join(
+    os.environ.get("XDG_DATA_HOME", os.path.expanduser("~/.local/share")), "quickshell", "secrets")
 TOKEN_FILE = os.path.join(CONFIG_DIR, "token.json")
 CACHE_FILE = os.path.expanduser("~/.cache/quickshell/calendar.json")
 

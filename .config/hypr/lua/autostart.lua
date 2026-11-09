@@ -1,19 +1,19 @@
 -- ~/.config/hypr/lua/autostart.lua
 local vars = require("lua.variables")
+local machine = require("lua.machine")
 
 hl.on("hyprland.start", function()
-	-- System Environment & Authentication
-	hl.exec_cmd("systemctl --user import-environment")
-	hl.exec_cmd("bash -c 'hash dbus-update-activation-environment 2>/dev/null'")
-	hl.exec_cmd("dbus-update-activation-environment --systemd")
-	hl.exec_cmd("/usr/lib/hyprpolkitagent")
+	-- uwsm exports the environment to systemd/dbus, and the polkit agent runs as
+	-- hyprpolkitagent.service (enabled by install.sh)
 
 	-- Core UI Daemons
 	hl.exec_cmd("quickshell -c bar")
-	hl.exec_cmd("openrgb --server")
+	if not machine.laptop then
+		hl.exec_cmd("openrgb --server")
+	end
 
 	-- Idle, Lock, and Wallpaper
-	hl.exec_cmd("QS_START_LOCKED=1 quickshell -p ~/.config/quickshell/lockscreen/lock.qml")
+	hl.exec_cmd("~/.config/quickshell/scripts/lock.sh --start")
 	hl.exec_cmd(vars.apps.idlehandler)
 	hl.exec_cmd("awww-daemon")
 	hl.exec_cmd("~/.config/quickshell/scripts/video-wallpaper.sh resume")

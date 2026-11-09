@@ -43,7 +43,14 @@ Singleton {
             property bool fetchNvidia: true
         }
     }
-    readonly property alias fetchNvidiaEnabled: settings.fetchNvidia
+    // The setting only matters when the NVIDIA driver is actually loaded
+    property bool hasNvidia: false
+    FileView {
+        path: "/proc/driver/nvidia/version"
+        printErrors: false
+        onLoaded: root.hasNvidia = true
+    }
+    readonly property bool fetchNvidiaEnabled: settings.fetchNvidia && root.hasNvidia
     function setFetchNvidia(enabled) { settings.fetchNvidia = enabled }
 
     // ── POLLING REFCOUNTS ──────────────────────────────────────
@@ -211,7 +218,9 @@ Singleton {
             const colon = line.indexOf(":")
             if (colon < 0) continue
             const iface = line.slice(0, colon).trim()
-            if (iface === "lo") continue
+            // Physical NICs only: VPN tunnels (tailscale, wg, tun), bridges and
+            // veths re-carry the same bytes and would double-count throughput
+            if (!/^(en|eth|wl|ww)/.test(iface)) continue
 
             const fields = line.slice(colon + 1).trim().split(/\s+/).map(Number)
             if (fields.length < 16) continue

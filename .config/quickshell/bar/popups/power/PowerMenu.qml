@@ -25,7 +25,7 @@ BasePopup {
         { icon: "󰌾", label: "Lock",      cmd: ["loginctl", "lock-session"],                     destructive: false },
         { icon: "󰒲", label: "Suspend",   cmd: ["systemctl", "suspend"],                          destructive: false },
         { icon: "󰋊", label: "Hibernate", cmd: ["systemctl", "hibernate"],                        destructive: false },
-        { icon: "󰍃", label: "Logout",    cmd: ["bash", "-c", "loginctl terminate-user $USER"],   destructive: true  },
+        { icon: "󰍃", label: "Logout",    cmd: ["uwsm", "stop"],                                  destructive: true  },
         { icon: "󰑐", label: "Reboot",    cmd: ["systemctl", "reboot"],                           destructive: true  },
         { icon: "󰐥", label: "Shutdown",  cmd: ["systemctl", "poweroff"],                         destructive: true  },
     ]

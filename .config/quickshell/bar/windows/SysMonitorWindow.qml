@@ -217,6 +217,7 @@ FloatingWindow {
                         Item { Layout.fillWidth: true }
 
                         Rectangle {
+                            visible: SysInfo.hasNvidia
                             width: 30
                             height: 16
                             radius: 8
@@ -274,7 +275,7 @@ FloatingWindow {
 
                     Text {
                         visible: !SysInfo.fetchNvidiaEnabled
-                        text: "NVIDIA fetching off"
+                        text: SysInfo.hasNvidia ? "NVIDIA fetching off" : "No NVIDIA GPU"
                         color: Theme.hexToRgba(Theme.foreground, 0.4)
                         font.pixelSize: 11
                     }

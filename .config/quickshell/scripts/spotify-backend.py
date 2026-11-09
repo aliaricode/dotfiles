@@ -43,7 +43,9 @@ import urllib.error
 import urllib.parse
 import urllib.request
 
-CONFIG_DIR = os.path.expanduser("~/.config/quickshell/scripts")
+# Secrets live outside the dotfiles checkout so they can never be committed or stowed
+CONFIG_DIR = os.path.join(
+    os.environ.get("XDG_DATA_HOME", os.path.expanduser("~/.local/share")), "quickshell", "secrets")
 TOKEN_FILE = os.path.join(CONFIG_DIR, "spotify_token.json")
 
 API_BASE = "https://api.spotify.com/v1"

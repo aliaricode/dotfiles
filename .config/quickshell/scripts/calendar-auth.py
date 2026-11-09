@@ -19,7 +19,9 @@ from google_auth_oauthlib.flow import InstalledAppFlow
 
 SCOPES = ["https://www.googleapis.com/auth/calendar.events"]
 
-CONFIG_DIR = os.path.expanduser("~/.config/quickshell/scripts")
+# Secrets live outside the dotfiles checkout so they can never be committed or stowed
+CONFIG_DIR = os.path.join(
+    os.environ.get("XDG_DATA_HOME", os.path.expanduser("~/.local/share")), "quickshell", "secrets")
 CREDENTIALS_FILE = os.path.join(CONFIG_DIR, "credentials.json")
 TOKEN_FILE = os.path.join(CONFIG_DIR, "token.json")
 
@@ -37,7 +39,7 @@ def main():
     flow = InstalledAppFlow.from_client_secrets_file(CREDENTIALS_FILE, SCOPES)
     creds = flow.run_local_server(port=0)
 
-    os.makedirs(CONFIG_DIR, exist_ok=True)
+    os.makedirs(CONFIG_DIR, mode=0o700, exist_ok=True)
     with open(TOKEN_FILE, "w") as f:
         f.write(creds.to_json())
     os.chmod(TOKEN_FILE, 0o600)

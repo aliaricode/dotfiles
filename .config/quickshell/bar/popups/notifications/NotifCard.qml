@@ -128,5 +128,11 @@ Item {
                 }
             }
         }
+
+        NotifActions {
+            Layout.fillWidth: true
+            Layout.topMargin: 4
+            notification: root.notification
+        }
     }
 }

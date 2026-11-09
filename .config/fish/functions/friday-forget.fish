@@ -1,3 +1,3 @@
-function friday-forget --wraps='rm ~/.cache/friday_history.json && echo "Friday: Memory format complete."' --description 'alias friday-forget=rm ~/.cache/friday_history.json && echo "Friday: Memory format complete."'
-    rm ~/.cache/friday_history.json && echo "Friday: Memory format complete." $argv
+function friday-forget --description 'Wipe Friday chat history'
+    rm -f ~/.cache/friday_history.json && echo "Friday: Memory format complete."
 end

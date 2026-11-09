@@ -56,9 +56,9 @@ The script will:
 1. Check for an internet connection and install `paru`/`stow`/base tools
 2. Install packages from `pkglist_native.txt` (pacman) and `pkglist_aur.txt` (paru)
 3. Detect your GPU and install the appropriate desktop/laptop extras
-4. Stow all config directories into `~/.config`
-5. Set `fish` as your default shell and wire up `uwsm` autostart for Hyprland
-6. Reboot
+4. Stow all config directories into `~/.config` (existing files that would conflict are moved to `*.bak`)
+5. Set `fish` as your default shell (the `uwsm` autostart for Hyprland lives in `config.fish`) and enable the `hyprpolkitagent` user service
+6. Ask whether to reboot
 
 To change your theme, just pick a new wallpaper through the Quickshell wallpaper picker — `wallust` handles the rest automatically.
 
@@ -67,10 +67,10 @@ To change your theme, just pick a new wallpaper through the Quickshell wallpaper
 The calendar popup works out of the box for weather and the month view. Google Calendar events need credentials that can't be shipped in a repo:
 
 1. Create an OAuth client (Desktop app) in the Google Cloud console
-2. Save it as `~/.config/quickshell/scripts/credentials.json`
+2. Save it as `~/.local/share/quickshell/secrets/credentials.json`
 3. Run once, by hand: `python3 ~/.config/quickshell/scripts/calendar-auth.py`
 
-That writes `token.json`, which the shell then refreshes silently. Both files are gitignored. Without them the calendar simply shows no events — nothing else is affected.
+That writes `token.json` next to it, which the shell then refreshes silently. Secrets live outside the repo (the Spotify player's `spotify_credentials.json`/`spotify_token.json` too), so they can't be committed by accident. Without them the calendar simply shows no events — nothing else is affected.
 
 ## 📁 Structure
 

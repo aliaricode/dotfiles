@@ -26,6 +26,7 @@ local defaults = {
 		region = "grimblast copy area",
 		window = "grimblast copy active",
 		screen = "grimblast copy output",
+		save = "grimblast --notify copysave area",
 	},
 }
 

@@ -46,7 +46,7 @@ ToggleListPopup {
         nmtui.startDetached()
     }
 
-    readonly property string terminal: Quickshell.env("TERMINAL") || "/usr/bin/alacritty"
+    readonly property string terminal: Quickshell.env("TERMINAL") || "alacritty"
 
     Process {
         id: nmtui

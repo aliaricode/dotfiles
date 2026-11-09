@@ -8,16 +8,19 @@ function friday
         end
 
         # Screenshot & Analysis
-        grim /tmp/friday_vision.png
-        set img_base64 (base64 -w 0 /tmp/friday_vision.png)
+        set tmpdir (mktemp -d -t friday.XXXXXX)
+        grim $tmpdir/screen.png
+        base64 -w 0 $tmpdir/screen.png >$tmpdir/screen.b64
         set vision_sys "You are FRIDAY. Sarcastic, feminine. Look at this screen. Be concise. Address user as 'Boss'."
 
-        echo "{ \"model\": \"llava\", \"prompt\": \"$vision_sys USER: $user_prompt\", \"images\": [\"$img_base64\"], \"stream\": false }" >/tmp/friday_payload.json
+        # jq does the escaping, so quotes/newlines in the prompt can't break the JSON
+        jq -n --arg prompt "$vision_sys USER: $user_prompt" --rawfile img $tmpdir/screen.b64 \
+            '{model: "llava", prompt: $prompt, images: [$img], stream: false}' >$tmpdir/payload.json
         echo "Friday is looking..."
-        set response (curl -s http://localhost:11434/api/generate -d @/tmp/friday_payload.json | jq -r .response)
+        set response (curl -s http://localhost:11434/api/generate -d @$tmpdir/payload.json | jq -r .response)
 
         # Cleanup
-        rm /tmp/friday_vision.png /tmp/friday_payload.json
+        rm -rf $tmpdir
 
     else
         # --- CHAT MODE ---
@@ -37,12 +40,9 @@ function friday
 
         # Updates Check
         set updates_file /tmp/friday_updates
-        if not test -f $updates_file; or test -n "(find $updates_file -mmin +60 2>/dev/null)"
-            checkupdates >"$updates_file.tmp" 2>/dev/null
-            set up_status $status
-            if test $up_status -eq 0 -o $up_status -eq 2
-                wc -l <"$updates_file.tmp" >$updates_file
-            end &
+        if not test -f $updates_file; or test -n "$(find $updates_file -mmin +60 2>/dev/null)"
+            # fish can't background a block, so refresh in a child shell (exit 2 = no updates)
+            sh -c 'checkupdates >"$1.tmp" 2>/dev/null; rc=$?; if [ $rc -eq 0 ] || [ $rc -eq 2 ]; then wc -l <"$1.tmp" >"$1"; fi' sh $updates_file &
         end
         set _updates (cat $updates_file 2>/dev/null || echo "0")
 
@@ -57,11 +57,8 @@ function friday
         # Weather
         set weather_file /tmp/friday_weather
 
-        if not test -f $weather_file; or test -n "(find $weather_file -mmin +60 2>/dev/null)"
-            begin
-                curl -m 5 -s "wttr.in/Büyükçekmece?format=%C+%t" >"$weather_file.tmp"
-                and mv "$weather_file.tmp" $weather_file
-            end &
+        if not test -f $weather_file; or test -n "$(find $weather_file -mmin +60 2>/dev/null)"
+            sh -c 'curl -m 5 -sf "wttr.in/Büyükçekmece?format=%C+%t" >"$1.tmp" && mv "$1.tmp" "$1"' sh $weather_file &
         end
 
         if test -s $weather_file

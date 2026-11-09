@@ -33,26 +33,28 @@ Singleton {
         blockLoading: true
         onFileChanged: reload()
 
+        // Used until wallust has written theme.json (fresh install) -- same
+        // palette as hypr/lua/colors_default.lua, so nothing is black-on-black
         JsonAdapter {
             id: adapter
-            property string background: "#000000"
-            property string foreground: "#ffffff"
-            property string color0:  "#000000"
-            property string color1:  "#000000"
-            property string color2:  "#000000"
-            property string color3:  "#000000"
-            property string color4:  "#000000"
-            property string color5:  "#000000"
-            property string color6:  "#000000"
-            property string color7:  "#000000"
-            property string color8:  "#000000"
-            property string color9:  "#000000"
-            property string color10: "#000000"
-            property string color11: "#000000"
-            property string color12: "#000000"
-            property string color13: "#000000"
-            property string color14: "#000000"
-            property string color15: "#000000"
+            property string background: "#36393D"
+            property string foreground: "#BFB0B6"
+            property string color0:   "#433B33"
+            property string color1:   "#06472C"
+            property string color2:   "#6A1E0E"
+            property string color3:   "#167B39"
+            property string color4:   "#AD6E20"
+            property string color5:   "#20EAD4"
+            property string color6:   "#2195FE"
+            property string color7:   "#9B868E"
+            property string color8:   "#6C5E64"
+            property string color9:   "#06472C"
+            property string color10:  "#6A1E0E"
+            property string color11:  "#167B39"
+            property string color12:  "#AD6E20"
+            property string color13:  "#20EAD4"
+            property string color14:  "#2195FE"
+            property string color15:  "#9B868E"
         }
     }
 

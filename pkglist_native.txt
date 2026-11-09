@@ -15,6 +15,7 @@
 #   grim                      screenshots (via grimblast, but relied on directly)
 #   ttf-nerd-fonts-symbols    "Symbols Nerd Font" -- every glyph in the shell
 #   ttf-fira-sans             misc.splash_font_family in theme.lua
+#   spotifyd                  Spotify player device ("quickshell-player") for MusicLibraryPopup
 # ─────────────────────────────────────────────────────────────
 7zip
 accountsservice
@@ -220,6 +221,7 @@ slurp
 smartmontools
 snapper
 sof-firmware
+spotifyd
 steam
 stow
 sudo

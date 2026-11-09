@@ -1,7 +1,7 @@
 #!/bin/bash
 
 CLASS="com.github.th_ch.youtube_music"
-LOCK="/tmp/toggle-music.lock"
+LOCK="${XDG_RUNTIME_DIR:-/tmp}/toggle-music.lock"
 
 window_exists() {
   hyprctl clients | grep -q "class: $CLASS"

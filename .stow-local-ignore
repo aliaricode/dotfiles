@@ -1,0 +1,11 @@
+# Only .config/ is stowed into $HOME; everything else is repo tooling.
+# (This file replaces stow's built-in ignore list, so VCS files are listed too.)
+\.git
+\.gitignore
+\.stow-local-ignore
+^/README.*
+^/install\.sh
+^/pkglist_.*\.txt
+^/tlp\.conf
+old_config
+.*\.bak

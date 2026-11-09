@@ -62,9 +62,35 @@ Singleton {
         if (k === settings.temperature) return
 
         settings.temperature = k
-        if (root.enabled) {
-            Quickshell.execDetached(["pkill", "-x", "hyprsunset"])
-            restartTimer.restart()
+        if (root.enabled) root._retune()
+    }
+
+    // Retune the running hyprsunset over its IPC socket instead of restarting
+    // it (no flash). Slider drags are coalesced to the latest value; if IPC
+    // fails (old hyprsunset, socket not up yet) fall back to a restart.
+    property bool _retunePending: false
+
+    function _retune() {
+        if (tuneProc.running) {
+            root._retunePending = true
+            return
+        }
+        root._retunePending = false
+        tuneProc.command = ["hyprctl", "hyprsunset", "temperature", String(settings.temperature)]
+        tuneProc.running = true
+    }
+
+    Process {
+        id: tuneProc
+        property string out: ""
+        stdout: StdioCollector { onStreamFinished: tuneProc.out = text }
+        onExited: (code) => {
+            if (code !== 0 || !tuneProc.out.trim().startsWith("ok")) {
+                Quickshell.execDetached(["pkill", "-x", "hyprsunset"])
+                restartTimer.restart()
+            } else if (root._retunePending) {
+                root._retune()
+            }
         }
     }
 

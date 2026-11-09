@@ -35,7 +35,7 @@ ToggleListPopup {
 
     Process {
         id: bluetui
-        command: ["/usr/bin/alacritty", "--class", "bluetui", "-e", "/usr/bin/bluetui"]
+        command: [Quickshell.env("TERMINAL") || "alacritty", "--class", "bluetui", "-e", "/usr/bin/bluetui"]
     }
 
     rowDelegate: Component {

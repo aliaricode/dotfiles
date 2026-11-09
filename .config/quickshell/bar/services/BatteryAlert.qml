@@ -49,7 +49,11 @@ Singleton {
 
     Connections {
         target: root.bat
+        function onReadyChanged() { root.check() }
         function onPercentageChanged() { root.check() }
         function onStateChanged() { root.check() }
     }
+
+    // Catch "already low at login" instead of waiting for the next % change
+    Component.onCompleted: root.check()
 }

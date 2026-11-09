@@ -155,6 +155,16 @@ hl.bind(
 	{ description = "Clipboard & Screenshots: Copy region screenshot to clipboard" }
 )
 hl.bind(
+	mod .. " + PRINT",
+	hl.dsp.exec_cmd(vars.shots.window),
+	{ description = "Clipboard & Screenshots: Copy active window to clipboard" }
+)
+hl.bind(
+	"CTRL + PRINT",
+	hl.dsp.exec_cmd(vars.shots.save),
+	{ description = "Clipboard & Screenshots: Save region screenshot to file (and copy)" }
+)
+hl.bind(
 	"SHIFT + PRINT",
 	hl.dsp.exec_cmd(vars.shots.screen),
 	{ description = "Clipboard & Screenshots: Copy full screen to clipboard" }
@@ -172,12 +182,12 @@ hl.bind(
 hl.bind(
 	"XF86AudioRaiseVolume",
 	hl.dsp.exec_cmd("qs --config bar ipc call osd volumeUp"),
-	{ description = "Media & Hardware: Raise volume" }
+	{ locked = true, repeating = true, description = "Media & Hardware: Raise volume" }
 )
 hl.bind(
 	"XF86AudioLowerVolume",
 	hl.dsp.exec_cmd("qs --config bar ipc call osd volumeDown"),
-	{ description = "Media & Hardware: Lower volume" }
+	{ locked = true, repeating = true, description = "Media & Hardware: Lower volume" }
 )
 hl.bind(
 	"XF86AudioMute",
@@ -209,28 +219,47 @@ hl.bind(
 hl.bind(
 	"XF86MonBrightnessUp",
 	hl.dsp.exec_cmd("qs --config bar ipc call osd brightnessUp"),
-	{ description = "Media & Hardware: Raise brightness" }
+	{ locked = true, repeating = true, description = "Media & Hardware: Raise brightness" }
 )
 hl.bind(
 	"XF86MonBrightnessDown",
 	hl.dsp.exec_cmd("qs --config bar ipc call osd brightnessDown"),
-	{ description = "Media & Hardware: Lower brightness" }
+	{ locked = true, repeating = true, description = "Media & Hardware: Lower brightness" }
 )
 
-hl.bind(
-	"switch:on:Lid Switch",
-	hl.dsp.dpms({ action = "disable" }),
-	{ locked = true, description = "Media & Hardware: Screen off on lid close" }
-)
-hl.bind(
-	"switch:off:Lid Switch",
-	hl.dsp.dpms({ action = "enable" }),
-	{ locked = true, description = "Media & Hardware: Screen on on lid open" }
-)
+-- Lid: only the internal panel goes dark, so an external monitor keeps working
+local INTERNAL = "eDP-1"
+local MONITORS_FILE = os.getenv("HOME") .. "/.config/hypr/monitors.lua"
+
+local function has_external_monitor()
+	for _, m in ipairs(hl.get_monitors()) do
+		if m.name ~= INTERNAL then
+			return true
+		end
+	end
+	return false
+end
+
+hl.bind("switch:on:Lid Switch", function()
+	if has_external_monitor() then
+		hl.monitor({ output = INTERNAL, disabled = true })
+	else
+		hl.dispatch(hl.dsp.dpms({ action = "disable" }))
+	end
+end, { locked = true, description = "Media & Hardware: Internal screen off on lid close" })
+
+hl.bind("switch:off:Lid Switch", function()
+	-- Re-run the nwg-displays layout so the panel comes back with its saved mode/position
+	local ok = pcall(dofile, MONITORS_FILE)
+	if not ok then
+		hl.monitor({ output = INTERNAL, mode = "preferred", position = "auto", scale = 1 })
+	end
+	hl.dispatch(hl.dsp.dpms({ action = "enable" }))
+end, { locked = true, description = "Media & Hardware: Screen on on lid open" })
 
 hl.bind(
 	mod .. " + L",
-	hl.dsp.exec_cmd("quickshell -p ~/.config/quickshell/lockscreen/lock.qml ipc call lock lock"),
+	hl.dsp.exec_cmd("~/.config/quickshell/scripts/lock.sh"),
 	{ description = "Media & Hardware: Lock screen" }
 )
 
@@ -257,8 +286,8 @@ for i = 1, 10 do
 	)
 end
 
-hl.bind(mod .. " + PERIOD", hl.dsp.focus({ workspace = "e-1" }), { description = "Workspaces: Previous workspace" })
-hl.bind(mod .. " + COMMA", hl.dsp.focus({ workspace = "e+1" }), { description = "Workspaces: Next workspace" })
+hl.bind(mod .. " + COMMA", hl.dsp.focus({ workspace = "e-1" }), { description = "Workspaces: Previous workspace" })
+hl.bind(mod .. " + PERIOD", hl.dsp.focus({ workspace = "e+1" }), { description = "Workspaces: Next workspace" })
 hl.bind(
 	mod .. " + mouse_down",
 	hl.dsp.focus({ workspace = "e+1" }),

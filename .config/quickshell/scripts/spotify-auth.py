@@ -23,7 +23,9 @@ import urllib.request
 import webbrowser
 from http.server import BaseHTTPRequestHandler, HTTPServer
 
-CONFIG_DIR = os.path.expanduser("~/.config/quickshell/scripts")
+# Secrets live outside the dotfiles checkout so they can never be committed or stowed
+CONFIG_DIR = os.path.join(
+    os.environ.get("XDG_DATA_HOME", os.path.expanduser("~/.local/share")), "quickshell", "secrets")
 CREDENTIALS_FILE = os.path.join(CONFIG_DIR, "spotify_credentials.json")
 TOKEN_FILE = os.path.join(CONFIG_DIR, "spotify_token.json")
 
@@ -154,7 +156,7 @@ def main():
     token_data["client_id"] = client_id
     token_data["client_secret"] = client_secret
 
-    os.makedirs(CONFIG_DIR, exist_ok=True)
+    os.makedirs(CONFIG_DIR, mode=0o700, exist_ok=True)
     _save_token(token_data)
 
     try:

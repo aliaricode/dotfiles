@@ -14,10 +14,16 @@ local function is_laptop()
 end
 
 local laptop = is_laptop()
+-- Only present when the proprietary/open NVIDIA kernel driver is loaded
+local nvidia = file_exists("/proc/driver/nvidia/version")
 
 hl.config({
 	debug = { vfr = true },
-	misc = { force_default_wallpaper = 0 },
+	misc = {
+		force_default_wallpaper = 0,
+		-- lets lock.sh start a new lockscreen if the old one crashed while locked
+		allow_session_lock_restore = true,
+	},
 })
 
 hl.curve("machineEase", { type = "bezier", points = { { 0.05, 0.9 }, { 0.1, 1.05 } } })
@@ -47,14 +53,12 @@ local profiles = {
 		},
 		env = {
 			{ "LIBVA_DRIVER_NAME", "iHD" },
-			{ "__GLX_VENDOR_LIBRARY_NAME", "iHD" },
 		},
 	},
 	desktop = {
 		general = { gaps_in = 5, gaps_out = 10, border_size = 3 },
 		blur_enabled = true,
 		vrr = 1,
-		no_hardware_cursors = 2,
 		animations = {
 			{ leaf = "windows", speed = 7, bezier = "machineEase" },
 			{ leaf = "windowsOut", speed = 7, bezier = "default", style = "popin 80%" },
@@ -64,15 +68,21 @@ local profiles = {
 			{ leaf = "workspaces", speed = 6, bezier = "default" },
 		},
 		gestures = {},
-		env = {
-			{ "LIBVA_DRIVER_NAME", "nvidia" },
-			{ "GBM_BACKEND", "nvidia-drm" },
-			{ "__GLX_VENDOR_LIBRARY_NAME", "nvidia" },
-		},
+		env = {},
 	},
 }
 
 local profile = profiles[laptop and "laptop" or "desktop"]
+
+-- NVIDIA-specific settings follow the driver, not the machine type (mesa needs no env vars)
+if nvidia and not laptop then
+	profile.no_hardware_cursors = 2
+	profile.env = {
+		{ "LIBVA_DRIVER_NAME", "nvidia" },
+		{ "GBM_BACKEND", "nvidia-drm" },
+		{ "__GLX_VENDOR_LIBRARY_NAME", "nvidia" },
+	}
+end
 
 -- ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 -- ┃                     Apply Active Profile                    ┃
@@ -102,3 +112,5 @@ end
 for _, e in ipairs(profile.env) do
 	hl.env(e[1], e[2])
 end
+
+return { laptop = laptop, nvidia = nvidia }

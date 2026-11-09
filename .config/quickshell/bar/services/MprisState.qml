@@ -7,13 +7,26 @@ import QtQuick
 Singleton {
     id: root
 
-    readonly property var activePlayer: {
+    // Last player that was playing, so pausing doesn't make the bar jump to
+    // some other idle player (e.g. a paused browser tab)
+    property var lastPlaying: null
+
+    readonly property var playingPlayer: {
         const players = Mpris.players.values
-        const preferred = players.find(p => 
+        const preferred = players.find(p =>
             (p.identity === "mpv" || p.identity === "Spotifyd") && p.isPlaying
         )
-        if (preferred) return preferred
-        return players.find(p => p.isPlaying) ?? players[0] ?? null
+        return preferred ?? players.find(p => p.isPlaying) ?? null
+    }
+
+    onPlayingPlayerChanged: if (playingPlayer) lastPlaying = playingPlayer
+
+    readonly property var activePlayer: {
+        const players = Mpris.players.values
+        if (root.playingPlayer) return root.playingPlayer
+        // lastPlaying may have exited; only reuse it while it's still registered
+        if (root.lastPlaying && players.includes(root.lastPlaying)) return root.lastPlaying
+        return players[0] ?? null
     }
 
     readonly property bool hasPlayer: activePlayer !== null

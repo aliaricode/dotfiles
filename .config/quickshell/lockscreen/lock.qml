@@ -30,7 +30,8 @@ Scope {
 
         WlSessionLockSurface {
             id: surface
-            color: "black"
+            // Shows through when ~/Pictures/current.png doesn't exist yet
+            color: Theme.background
 
             // ── STATE ─────────────────────────────────────────────
             property bool unlocking: false
@@ -374,9 +375,18 @@ Scope {
                         }
 
                         Image {
+                            id: avatarImage
                             anchors.fill: parent
                             source: "file://" + Quickshell.env("HOME") + "/Pictures/ProfilePhoto.png"
                             fillMode: Image.PreserveAspectCrop
+                        }
+                        // Fallback when ~/Pictures/ProfilePhoto.png doesn't exist
+                        Text {
+                            anchors.centerIn: parent
+                            visible: avatarImage.status !== Image.Ready
+                            text: "󰀄"
+                            color: Theme.hexToRgba(Theme.foreground, 0.6)
+                            font.pixelSize: 72
                         }
                         Item {
                             id: circleMask

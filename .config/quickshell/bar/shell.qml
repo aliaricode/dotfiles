@@ -37,5 +37,7 @@ Scope {
         value: BarRegistry.focusedBar
     }
 
+    // Singletons are created lazily on first use and nothing else references
+    // BatteryAlert, so touch it once to start its battery watcher
     Component.onCompleted: BatteryAlert.lowThreshold
 }

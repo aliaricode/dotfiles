@@ -1,8 +1,8 @@
 #!/bin/bash
 # Shared post-processing that runs after `wallust run` succeeds: swaps the
 # wallpaper cache, clears fastfetch's cache, reloads hyprland, reapplies blur,
-# and syncs RGB if openrgb is running. Sourced by apply-theme.sh and
-# update-colors.sh so this sequence only has to be edited in one place.
+# and syncs RGB if openrgb is running. Sourced by apply-theme.sh so this
+# sequence only has to be edited in one place.
 set -euo pipefail
 
 post_apply() {
@@ -19,6 +19,8 @@ post_apply() {
     notify-send "Wallust" "theme.json.new missing — shell colors not updated" -u critical
   fi
 
+  # Lockscreen background; ~/Pictures may not exist yet on a fresh install
+  mkdir -p ~/Pictures
   if ! magick "$still" ~/Pictures/current.png; then
     notify-send "Wallust" "Theme updated but wallpaper copy failed" -u critical
     return 1
@@ -33,6 +35,7 @@ post_apply() {
   notify-send "Reloading hypr apps..."
   hyprctl reload
   ~/.config/hypr/scripts/set-blur.sh
+  ~/.config/hypr/scripts/gamemode.sh reapply
   if pgrep -x "openrgb" >/dev/null; then
     "$script_dir/update-rgb.sh"
   fi

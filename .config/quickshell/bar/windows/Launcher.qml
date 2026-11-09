@@ -44,16 +44,16 @@ BaseExpandPopup {
 
     onAccepted: (index) => launcher.launch(filteredApps[index])
 
+    // Launched through `uwsm app` so each app gets its own systemd scope in the
+    // uwsm session instead of running as a child of the shell
     function launch(app) {
         if (!app) return
-        if (app.runInTerminal) {
-            Quickshell.execDetached({
-                command: ["/usr/bin/alacritty", "-e"].concat(app.command),
-                workingDirectory: app.workingDirectory
-            })
-        } else {
-            app.execute()
-        }
+        const terminal = Quickshell.env("TERMINAL") || "alacritty"
+        const cmd = app.runInTerminal ? [terminal, "-e"].concat(app.command) : app.command
+        Quickshell.execDetached({
+            command: ["uwsm", "app", "--"].concat(cmd),
+            workingDirectory: app.workingDirectory
+        })
         close()
     }
 
@@ -90,7 +90,7 @@ BaseExpandPopup {
                 spacing: 12
 
                 IconImage {
-                    source: launcher.resolveIcon(row.modelData.icon)
+                    source: launcher.resolveIcon(row.modelData?.icon)
                     implicitSize: 28
                     asynchronous: true
                 }
@@ -100,7 +100,7 @@ BaseExpandPopup {
                     spacing: 1
 
                     Text {
-                        text: row.modelData.name
+                        text: row.modelData?.name ?? ""
                         color: row.selected ? Theme.background : Theme.foreground
                         font.pixelSize: 13
                         font.bold: row.selected
@@ -109,7 +109,7 @@ BaseExpandPopup {
                     }
 
                     Text {
-                        text: row.modelData.genericName || row.modelData.comment || ""
+                        text: row.modelData?.genericName || row.modelData?.comment || ""
                         color: row.selected
                             ? Theme.hexToRgba(Theme.background, 0.7)
                             : Theme.hexToRgba(Theme.foreground, 0.5)

@@ -38,6 +38,6 @@ Process {
         }
     }
     stderr: StdioCollector {
-        onStreamFinished: if (text.trim() !== "") console.warn("[Spotify] stderr:", text)
+        onStreamFinished: if (text.trim() !== "") console.warn("[" + call.script.split("/").pop() + "] stderr:", text)
     }
 }

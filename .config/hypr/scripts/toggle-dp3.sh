@@ -1,13 +1,12 @@
-#!/bin/bash
-STATE_FILE="$HOME/.cache/hypr/dp3-disabled"
+#!/usr/bin/env bash
+# usage: toggle-dp3.sh [output]   (default: DP-3)
+# Toggles a secondary display. State is read from Hyprland itself, so it can't drift.
+OUTPUT="${1:-DP-3}"
 
-if [ -f "$STATE_FILE" ]; then
-  rm "$STATE_FILE"
-  hyprctl keyword monitor "DP-3,auto,0x0,1"
-  notify-send "DP-3 enabled"
+if hyprctl monitors -j | jq -e --arg o "$OUTPUT" 'any(.[]; .name == $o)' >/dev/null; then
+  hyprctl eval "hl.monitor({ output = \"$OUTPUT\", disabled = true })" >/dev/null
+  notify-send "$OUTPUT disabled"
 else
-  mkdir -p "$(dirname "$STATE_FILE")"
-  touch "$STATE_FILE"
-  hyprctl keyword monitor "DP-3,disable"
-  notify-send "DP-3 disabled"
+  hyprctl eval "hl.monitor({ output = \"$OUTPUT\", mode = \"preferred\", position = \"0x0\", scale = 1 })" >/dev/null
+  notify-send "$OUTPUT enabled"
 fi

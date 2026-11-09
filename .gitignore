@@ -2,33 +2,34 @@
 
 .config/alacritty/colors.toml
 .config/btop/themes/wallust.theme
-.config/hypr/hypr-colors.conf
-.config/hypr/monitors.lua
 .config/hypr/lua/colors.lua
 .config/gtk-3.0/gtk-colors.css
 .config/gtk-4.0/gtk-colors.css
-.config/waybar/colors.css
-.config/waypaper/colors.css
-.config/wlogout/colors.css
-.config/wofi/colors.css
 .config/wallust/wallust.json
 .config/cava/themes/wallust-colors
-.config/mako/config
 .config/quickshell/bar/theme.json
 
 # ignore stuff related to monitors
 
 .config/hypr/monitors.conf
+.config/hypr/monitors.lua
 .config/hypr/workspaces.conf
+.config/hypr/workspaces.lua
 
 #ignore wallpapers
 wallpapers
 
-# ignore calendar stuff
+# calendar location (secrets live in ~/.local/share/quickshell/secrets)
 .config/quickshell/bar/popups/calendar/weather.json
+
+# legacy secret locations, kept ignored in case an old copy is left behind
 .config/quickshell/scripts/credentials.json
 .config/quickshell/scripts/token.json
-
-# ignore spotify stuff
 .config/quickshell/scripts/spotify_credentials.json
 .config/quickshell/scripts/spotify_token.json
+
+# machine-local state
+.config/fish/fish_variables
+
+# editor/tool backups
+*.bak

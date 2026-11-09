@@ -1,4 +1,4 @@
--- ~/.config/hypr/lotm.lua
+-- ~/.config/hypr/scripts/lotm.lua
 
 local M = {}
 
