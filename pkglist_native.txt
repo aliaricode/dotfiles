@@ -16,6 +16,12 @@
 #   ttf-nerd-fonts-symbols    "Symbols Nerd Font" -- every glyph in the shell
 #   ttf-fira-sans             misc.splash_font_family in theme.lua
 #   spotifyd                  Spotify player device ("quickshell-player") for MusicLibraryPopup
+#   libqalculate              launcher "=" calculator (qalc)
+#   unicode-emoji             launcher ":" emoji picker (emoji-test.txt)
+#   fd                        launcher "/" file search
+#   gpu-screen-recorder       Capture menu screen recording (Recorder.qml)
+#   satty                     Capture menu "Region and annotate"
+#   slurp                     region selection for recordings
 # ─────────────────────────────────────────────────────────────
 7zip
 accountsservice
@@ -81,6 +87,7 @@ ex-vi-compat
 exfatprogs
 f2fs-tools
 fastfetch
+fd
 ffmpeg
 ffmpegthumbnailer
 file-roller
@@ -93,6 +100,7 @@ git
 github-cli
 glances
 gpicview
+gpu-screen-recorder
 grim
 gst-libav
 gst-plugin-pipewire
@@ -112,8 +120,8 @@ hyprland
 hyprland-protocols
 hyprpolkitagent
 hyprsunset
-img2pdf
 imagemagick
+img2pdf
 inetutils
 intel-gpu-tools
 intel-media-driver
@@ -131,6 +139,7 @@ libdvdcss
 libgsf
 libnotify
 libopenraw
+libqalculate
 libva-intel-driver
 libva-utils
 libwnck3
@@ -216,6 +225,7 @@ rmpc
 rsync
 rtkit
 s-nail
+satty
 sg3_utils
 slurp
 smartmontools
@@ -244,6 +254,7 @@ ttf-opensans
 tumbler
 ufw
 umu-launcher
+unicode-emoji
 unrar
 unzip
 upower

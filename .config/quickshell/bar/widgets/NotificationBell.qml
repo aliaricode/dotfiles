@@ -4,6 +4,7 @@ import qs.services
 import qs.components
 import qs.popups.notifications
 import Quickshell
+import Quickshell.Io
 import QtQuick
 
 BarButton {
@@ -32,6 +33,14 @@ BarButton {
     popup: NotifCenter {}
 
     onRightClicked: NotifService.toggleDnd()
+
+    // `qs -c bar ipc call notifications toggle`; only the focused monitor's
+    // bell answers, since every bar has one
+    IpcHandler {
+        target: "notifications"
+        enabled: root.barWindow === BarRegistry.focusedBar
+        function toggle(): void { root.openPopup() }
+    }
 
     ExpandingWidget {
         id: widget

@@ -224,6 +224,7 @@ hl.layer_rule({ match = { namespace = "wallpaper" }, blur = true, ignore_alpha =
 hl.layer_rule({ match = { namespace = "quickshell:toast" }, blur = true, ignore_alpha = 0.05, no_anim = true })
 hl.layer_rule({ match = { namespace = "launcher" }, blur = true, ignore_alpha = 0.05, no_anim = true })
 hl.layer_rule({ match = { namespace = "clipboard" }, blur = true, ignore_alpha = 0.05, no_anim = true })
+hl.layer_rule({ match = { namespace = "quickshell:switcher" }, blur = true, ignore_alpha = 0.05 })
 
 -- ============================================================
 -- 13. WORKSPACE RULES

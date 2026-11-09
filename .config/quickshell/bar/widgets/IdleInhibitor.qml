@@ -18,6 +18,7 @@ Item {
 
     MouseArea {
         anchors.fill: parent
-        onClicked: IdleInhibit.inhibiting = !IdleInhibit.inhibiting
+        // Same source as the Quick Settings "Keep Awake" tile (inhibiting is read-only)
+        onClicked: IdleInhibit.toggle("manual")
     }
 }

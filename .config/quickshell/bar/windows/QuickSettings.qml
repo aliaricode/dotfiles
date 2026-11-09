@@ -31,6 +31,8 @@ BaseExpandPopup {
         Brightness.refresh()
         NightLight.refresh()
         UpdatesService.refresh()
+        GameMode.refresh()
+        Vpn.polling = true
     }
 
     onDetailChanged: {
@@ -39,7 +41,10 @@ BaseExpandPopup {
             BtService.adapter.discovering = (popup.detail === "bluetooth")
     }
 
-    onVisibleChanged: if (!visible) popup.detail = ""
+    onVisibleChanged: if (!visible) {
+        popup.detail = ""
+        Vpn.polling = false
+    }
 
     readonly property string detailTitle: {
         if (popup.detail === "wifi") return "Wi-Fi"
@@ -177,6 +182,41 @@ BaseExpandPopup {
                     hasDetail: UpdatesService.pendingCount > 0
                     onActivated: UpdatesService.runUpdate()
                     onDetailRequested: popup.detail = "updates"
+                }
+
+                QuickSettingsTile {
+                    Layout.fillWidth: true
+                    visible: Vpn.wsAvailable
+                    icon: Vpn.wsConnected ? "󰦝" : "󰦞"
+                    label: "Windscribe"
+                    sublabel: Vpn.wsBusy && !Vpn.wsConnected ? (Vpn.wsState || "Connecting") + "…"
+                        : Vpn.wsConnected ? (Vpn.wsLocation || "Connected")
+                        : "Off"
+                    active: Vpn.wsConnected
+                    // Pressing it while the app is closed launches Windscribe and connects
+                    interactive: !Vpn.wsBusy
+                    onActivated: Vpn.toggleWindscribe()
+                }
+
+                // Only once tailscale is logged in; logging in is a one-off in a terminal
+                QuickSettingsTile {
+                    Layout.fillWidth: true
+                    visible: Vpn.tsAvailable && Vpn.tsLoggedIn
+                    icon: "󰛳"
+                    label: "Tailscale"
+                    sublabel: Vpn.tsConnected ? "Connected" : (Vpn.tsState === "Starting" ? "Starting…" : "Off")
+                    active: Vpn.tsConnected
+                    onActivated: Vpn.toggleTailscale()
+                }
+
+                QuickSettingsTile {
+                    Layout.fillWidth: true
+                    icon: "󰊗"
+                    label: "Game Mode"
+                    sublabel: GameMode.busy ? "Switching…" : (GameMode.active ? "Effects off" : "Off")
+                    active: GameMode.active
+                    interactive: !GameMode.busy
+                    onActivated: GameMode.toggle()
                 }
             }
 

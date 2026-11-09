@@ -47,13 +47,15 @@ PopupWindow {
     color: "transparent"
     visible: false
 
-    property int fastCloseDuration: 300
+    // Used when another popup is taking over
+    property int fastCloseDuration: 160
     property int heightAnimDuration: root.heightPhaseDuration
 
     ExpandPopupController {
         id: controller
         animEnter: root.heightPhaseDuration
-        animExit: root.heightAnimDuration
+        // Hide (and let the pill start shrinking) once the fold is nearly done
+        animExit: Math.round(root.heightAnimDuration * ExpandPopupCoordinator.closeOverlap)
         onClosed: {
             ExpandPopupCoordinator.collapse(root)
             root.visible = false
@@ -74,9 +76,10 @@ PopupWindow {
     }
 
     // ---- height phase (width phase duration comes from the coordinator) ----
-    property real heightPhaseMultiplier: 3000
-    readonly property int heightPhaseDuration: Math.round(
-        root.implicitHeight / ExpandPopupCoordinator.growSpeed * root.heightPhaseMultiplier)
+    // >1 slows this popup's drop down relative to the others
+    property real heightPhaseScale: 1.0
+    readonly property int heightPhaseDuration:
+        ExpandPopupCoordinator.durationFor(0, root.implicitHeight, root.heightPhaseScale)
     readonly property real collapsedHeight: barWindow ? barWindow.pillHeight : 44
     property real cardCollapsedHeight: 0
 
@@ -85,7 +88,8 @@ PopupWindow {
 
     Timer {
         id: widthPhaseTimer
-        interval: root.openPhaseDuration
+        // Start dropping down while the pill finishes stretching
+        interval: Math.round(root.openPhaseDuration * ExpandPopupCoordinator.phaseOverlap)
         onTriggered: {
             root.heightAnimDuration = root.heightPhaseDuration
             controller.open()
@@ -117,7 +121,7 @@ PopupWindow {
         widthPhaseTimer.stop()
         root.heightAnimDuration = fast === true
             ? root.fastCloseDuration
-            : root.heightPhaseDuration
+            : Math.round(root.heightPhaseDuration * ExpandPopupCoordinator.closeScale)
         root.cardCollapsedHeight = root.collapsedHeight
         focusGrab.active = false
         controller.close()
@@ -162,7 +166,8 @@ PopupWindow {
     readonly property bool contentReady: controller.animIn && !growGuard.running
     Timer {
         id: growGuard
-        interval: root.heightPhaseDuration
+        // Content fades in while the card is still landing
+        interval: Math.round(root.heightPhaseDuration * 0.5)
     }
     Connections {
         target: controller
@@ -186,7 +191,7 @@ PopupWindow {
         Behavior on height {
             NumberAnimation {
                 duration: root.heightAnimDuration
-                easing.type: Easing.OutCubic
+                easing.type: ExpandPopupCoordinator.easing
             }
         }
 

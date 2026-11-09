@@ -7,10 +7,14 @@ My personal Linux desktop, running Hyprland on CachyOS with a fully custom shell
 - **Custom Quickshell shell** — a single coordinated shell replacing the usual bar/launcher/notification-daemon/lockscreen stack:
   - **Bar** — three-pill layout with interactive modules (workspaces, media player, system monitor, clock, audio, backlight, network, bluetooth, battery, tray, notifications) — nearly every module opens its own popup rather than being a static readout
   - **OSD** — custom on-screen display for volume and brightness
-  - **Launcher** — native app launcher
-  - **Clipboard manager** — Quickshell frontend over `cliphist`
-  - **Quick settings** — Control-Center-style tile grid (Wi-Fi, Bluetooth, airplane mode, night light, DND, keep-awake) with volume/brightness sliders, and tiles that expand in place into full network/bluetooth/temperature panes
-  - **Notification center** — SwayNC-inspired, built natively in Quickshell (toast + history/center view), with a critical-priority toast queue so error notifications can't be buried by chatty ones
+  - **Launcher** — native app launcher with prefix modes: `=` calculator (qalc), `:` emoji picker, `?` web search, `>` run a command (Shift+Enter for a terminal), `/` file search (fd)
+  - **Window switcher** — Alt+Tab with live window previews in most-recently-used order (release Alt to switch, or keep it open as an overview: type to filter, Ctrl+W closes a window); Super+the key left of 1 opens it as an overview
+  - **Screenshot & recording menu** (Super+Shift+S) — region/window/screen to clipboard or file, annotate with satty, delayed shots, and hardware-encoded screen recording via gpu-screen-recorder with a recording timer in the bar (click it or Super+Shift+R to stop)
+  - **Privacy indicators** — mic, camera and screen-share icons appear in the bar while an app captures them (read from the PipeWire graph); hover to see which apps
+  - **Keyboard layout guard** — each machine starts in its own layout (TR on the laptop, US on the desktop) and an accidental Alt+Shift switch pops a notification
+  - **Clipboard manager** — Quickshell frontend over `cliphist` with image thumbnails and a preview of the selected image; pin entries with Ctrl+P (pins survive clearing history), remove with Ctrl+D
+  - **Quick settings** — Control-Center-style tile grid (Wi-Fi, Bluetooth, airplane mode, night light, DND, keep-awake) with volume/brightness sliders, and tiles that expand in place into full network/bluetooth/temperature panes Also has Windscribe and Tailscale tiles (Tailscale appears once it's logged in; toggling it needs `sudo tailscale set --operator=$USER` once) and a Game Mode tile.
+  - **Notification center** — SwayNC-inspired, built natively in Quickshell (toast + history/center view), with a critical-priority toast queue so error notifications can't be buried by chatty ones Notifications from the same app stack into one group ("Discord · 3") that expands on click.
   - **Lockscreen** — native Quickshell lock screen with PAM password _and_ fingerprint auth running in parallel
   - **Wallpaper picker** — see below; considerably more than a wallpaper list
   - **Calendar** — month view with Google Calendar events, quick-add via natural language, and current weather from open-meteo

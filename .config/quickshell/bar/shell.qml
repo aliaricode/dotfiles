@@ -11,12 +11,15 @@ Scope {
     OSD {}
     NotifToast {}
     PowerActions {}
+    KeyboardLayoutNotifier {}
     Wallpaper {}
     Launcher {}
     Clipboard {}
     MusicLibraryPopup {}
     QuickSettings {}
     Keybinds {}
+    WindowSwitcher {}
+    Capture {}
 
     LazyLoader {
         id: sysMonitorLoader

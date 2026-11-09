@@ -62,6 +62,25 @@ hl.bind(mod .. " + V", hl.dsp.window.float({ action = "toggle" }), { description
 hl.bind(mod .. " + Y", hl.dsp.window.pin(), { description = "Windows: Pin window" })
 hl.bind(mod .. " + J", hl.dsp.layout("togglesplit"), { description = "Windows: Toggle split layout" })
 
+-- Window switcher (Quickshell). Releasing Alt picks the selected window; the
+-- release bind only calls out while a switch is in progress.
+local alt_tab_active = false
+hl.bind("ALT + Tab", function()
+	alt_tab_active = true
+	hl.exec_cmd("qs --config bar ipc call switcher altTab")
+end, { description = "Windows: Switch windows (release Alt to pick)" })
+hl.bind("ALT + ALT_L", function()
+	if alt_tab_active then
+		alt_tab_active = false
+		hl.exec_cmd("qs --config bar ipc call switcher altReleased")
+	end
+end, { release = true, description = "Windows: Finish Alt+Tab switch" })
+hl.bind(
+	mod .. " + code:49", -- key left of 1, by keycode so it works on both TR and US layouts
+	hl.dsp.exec_cmd("qs --config bar ipc call switcher toggle"),
+	{ description = "Windows: Window overview (key left of 1)" }
+)
+
 -- Grouping
 hl.bind(mod .. " + K", hl.dsp.group.toggle(), { description = "Windows: Toggle window group" })
 hl.bind(mod .. " + Tab", hl.dsp.group.next(), { description = "Windows: Next window in group" })
@@ -148,6 +167,16 @@ hl.bind(
 	"code:135",
 	hl.dsp.exec_cmd("qs --config bar ipc call clipboard toggle"),
 	{ description = "Clipboard & Screenshots: Toggle clipboard history (Menu key, alt keyboards)" }
+)
+hl.bind(
+	mod .. " + SHIFT + S",
+	hl.dsp.exec_cmd("qs --config bar ipc call capture toggle"),
+	{ description = "Clipboard & Screenshots: Screenshot & recording menu" }
+)
+hl.bind(
+	mod .. " + SHIFT + R",
+	hl.dsp.exec_cmd("qs --config bar ipc call recorder stop"),
+	{ description = "Clipboard & Screenshots: Stop screen recording" }
 )
 hl.bind(
 	"PRINT",

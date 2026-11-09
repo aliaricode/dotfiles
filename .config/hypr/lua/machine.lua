@@ -34,6 +34,7 @@ hl.curve("machineEase", { type = "bezier", points = { { 0.05, 0.9 }, { 0.1, 1.05
 
 local profiles = {
 	laptop = {
+		kb_layout = "tr, us", -- built-in Turkish keyboard
 		general = { gaps_in = 3, gaps_out = 5, border_size = 2 },
 		rounding = 5,
 		blur_enabled = false,
@@ -56,6 +57,7 @@ local profiles = {
 		},
 	},
 	desktop = {
+		kb_layout = "us, tr", -- US keyboard, so start in English
 		general = { gaps_in = 5, gaps_out = 10, border_size = 3 },
 		blur_enabled = true,
 		vrr = 1,
@@ -92,6 +94,7 @@ local config = {
 	general = profile.general,
 	decoration = { blur = { enabled = profile.blur_enabled } },
 	misc = { vrr = profile.vrr },
+	input = { kb_layout = profile.kb_layout },
 }
 if profile.rounding then
 	config.decoration.rounding = profile.rounding

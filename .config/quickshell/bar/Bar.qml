@@ -86,7 +86,7 @@ Scope {
 
                     width: expandedHere ? ExpandPopupCoordinator.targetWidth : implicitWidth
                     Behavior on width {
-                        NumberAnimation { id: pillWidthAnim; easing.type: Easing.OutCubic }
+                        NumberAnimation { id: pillWidthAnim; easing.type: ExpandPopupCoordinator.easing }
                     }
 
                     Connections {
@@ -123,6 +123,8 @@ Scope {
                     padding: 15
                     spacing: 8
 
+                    PrivacyIndicator {}
+                    RecordingIndicator {}
                     IdleInhibitor {}
                     Audio { barWindow: barWindow }
                     Backlight {}

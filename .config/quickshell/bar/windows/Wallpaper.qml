@@ -22,7 +22,7 @@ BaseExpandPopup {
     implicitWidth: barWindow ? barWindow.width * 0.50 : 1200
     implicitHeight: 190
 
-    heightPhaseMultiplier: 4000
+    heightPhaseScale: 1.2
 
     property int applyingIndex: -1
     property string pendingFilename: ""
